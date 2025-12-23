@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import Float32
+
+class TemperatureSubscriber(Node):
+    def __init__(self):
+        super().__init__('temperature_subscriber') #Node name
+        self.subscriber = self.create_subscription(Float32, 'temperature', self.subscribe_temperature, 10) #same topic name to create single channel
+        self.get_logger().info('Temperature Publisher Node Started')
+
+    def subscribe_temperature(self, msg):
+        temp = msg.data
+
+        if temp > 28.0:
+            self.get_logger().warn(f'Temperature TOO HIGH: {temp}°C')
+        elif temp < 22.0:
+            self.get_logger().warn(f'Temperature TOO LOW: {temp}°C')
+        else:
+            self.get_logger().info(f'Temperature OK: {temp}°C')
+
+def main(args=None):
+    rclpy.init(args=args)
+    monitor = TemperatureSubscriber()
+    rclpy.spin(monitor)
+    monitor.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()        
